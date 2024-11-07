@@ -1,0 +1,131 @@
+<template>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="text-center my-4">isi presensi lab</h2>
+                <div class="card rounded-5" style="width: 70rem; height: 57vh; background-color: #D9D9D9;">
+                <form @submit.prevent="kirimData">
+                    <div class="mb-4 my-4">
+                        <input v-model="form.nama" class="form-control form-control-lg rounded-5 abu" type="text" placeholder="nama..."/>
+                    </div>
+                    <div class="mb-4">
+                        <select v-model="form.keanggotaan"  class="form-control form-control-lg form-select rounded-5 abu">
+                            <option value="">keanggotaan</option>
+                            <option v-for="(member, i) in members" :key="i" :value="member.id">{{ member.nama }}</option>
+                        </select>
+                    </div>
+                    <div v-if="form.keanggotaan == 2" class="mb-3">
+                        <div class="row">
+                            <div class="col-md-4"  >
+                                <select v-model="form.tingkat" class="form-control form-control-lg form-select rounded-4 mb-2 abu"  style="width: 20rem; height: 5vh; background-color: #131111;" >
+                                    <option value="">Tingkat</option>
+                                    <option value="X">X</option>
+                                    <option value="XI">XI</option>
+                                    <option value="XII">XII</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select v-model="form.jurusan" class="form-control form-control-lg form-select rounded-5 mb-2 abu" style="width: 20rem; height: 5vh; background-color: #131111;" >                                       <option value="">Jurusan</option>
+                                    <option value="PPLG">PPLG</option>
+                                    <option value="TJKT">TJKT</option>
+                                    <option value="TSM">TSM</option>
+                                    <option value="DKV">DKV</option>
+                                    <option value="TOI">TOI</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select v-model="form.kelas" class="form-control form-control-lg form-select rounded-5 mb-2 abu"   style="width: 20rem; height: 5vh; background-color: #131111;" >
+                                    <option value="">Kelas</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <select v-model="form.keperluan" class="form-control form-control-lg form-select rounded-5 mb-2 abu">
+                            <option value="">
+                                keperluan</option>
+                            <option v-for="(item, i) in objectives" :key="i" :value="item.id">{{ item.nama }}</option>
+                        </select>
+                    </div>
+                    <div class="position-relative">
+                    <nuxt-link to="/penggunaan_lab">
+                            <button class="btn position-absolute bottom-start-0 my-3 rounded-3" style="background-color: #131111;">kembali</button>
+                    </nuxt-link> 
+                            <button type="submit" class="btn position-absolute buttom-0 end-0 my-3 rounded-3" style="background-color: #131111;">simpan</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script setup>
+const supabase = useSupabaseClient()
+const members = ref([]);
+const objectives = ref([]);
+
+const form = ref({
+    nama: "",
+    keanggotaan:"",
+    tingkat:"",
+    jurusan:"",
+    kelas:"",
+    keperluan:"",
+});
+
+const kirimData = async () => {
+
+    const { error } = await supabase.from("penggunaan_lab").insert([form.value])
+    if(!error) navigateTo("/penggunaan_lab")
+    else throw error
+}
+
+const getkeanggotaan = async () => {
+    const { data, error } = await supabase.from("keanggotaan").select("*")
+    if(data) members.value = data
+};
+
+const getkeperluan = async () => {
+    const { data, error } = await supabase.from("keperluan").select("*")
+    if(data) objectives.value = data
+};
+
+onMounted(() => {
+    getkeanggotaan();
+    getkeperluan();
+});
+</script>
+<style scoped>
+.btn{
+    background-color: aquamarine;
+    color: rgb(255, 255, 255);
+}
+.nama{
+    background-color: rgb(255, 255, 255);
+}
+.keanggotaan{
+    background-color: rgb(255, 255, 255);
+}
+.tingkat{
+    background-color: antiquewhite;
+}
+.jurusan{
+    background-color: aqua;
+}
+.kelas{
+    background-color: aqua;
+}
+.keperluan{
+    background-color: aqua;
+}
+.abu{
+    background-color: #131111;
+    color: antiquewhite;
+    width: 35rem;
+}
+
+</style>
